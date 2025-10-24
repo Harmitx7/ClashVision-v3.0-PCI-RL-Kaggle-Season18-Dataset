@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClashVision v3.0-PCI-RL - Strategic Battle Analysis</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/clash-theme.css">
+    <link rel="stylesheet" href="css/tilted-cards.css">
+    <link rel="stylesheet" href="css/animated-scroll.css">
+    
+    <!-- Custom styles for PCI animation -->
+    <style>
+        @keyframes pci-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .pci-rotate {
+            animation: pci-rotate 3s linear infinite;
+        }
+    </style>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+    <script>
+        // Suppress Tailwind CDN warning for development
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            if (args[0] && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
+                return;
+            }
+            originalWarn.apply(console, args);
+        };
+        
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#f97316',
+                        win: '#10b981',
+                        loss: '#ef4444',
+                        legendary: '#fbbf24',
+                        epic: '#a855f7',
+                        rare: '#f97316',
+                        common: '#6b7280'
+                    },
+                    fontFamily: {
+                        'bangers': ['Bangers', 'cursive'],
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-[#F8F1E4] dark:bg-gray-900 min-h-screen">
+    <!-- Modern Clash Royale Dashboard -->
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
+        
+        <!-- Header -->
+        <header class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-xl shadow-lg transform hover:scale-105 transition-transform overflow-hidden bg-gradient-to-br from-blue-500 to-orange-500 p-1">
+                            <div class="w-full h-full bg-white rounded-lg flex items-center justify-center relative">
+                                <!-- ClashVision Logo Recreation -->
+                                <svg class="w-9 h-9" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Trophy Base -->
+                                    <circle cx="50" cy="65" r="20" fill="url(#goldGradient)" stroke="#D97706" stroke-width="2"/>
+                                    <!-- Trophy Cup -->
+                                    <path d="M35 45 L65 45 L62 65 L38 65 Z" fill="url(#goldGradient)" stroke="#D97706" stroke-width="1.5"/>
+                                    <!-- Crown -->
+                                    <path d="M40 35 L45 25 L50 30 L55 25 L60 35 L50 40 Z" fill="url(#crownGradient)" stroke="#DC2626"/>
+                                    <!-- Elixir Drops -->
+                                    <circle cx="25" cy="30" r="4" fill="#EC4899"/>
+                                    <circle cx="75" cy="30" r="4" fill="#EC4899"/>
+                                    <circle cx="20" cy="50" r="3" fill="#EC4899"/>
+                                    <circle cx="80" cy="50" r="3" fill="#EC4899"/>
+                                    
+                                    <defs>
+                                        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#FCD34D"/>
+                                            <stop offset="50%" style="stop-color:#F59E0B"/>
+                                            <stop offset="100%" style="stop-color:#D97706"/>
+                                        </linearGradient>
+                                        <linearGradient id="crownGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#FEF3C7"/>
+                                            <stop offset="100%" style="stop-color:#F59E0B"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="font-bangers text-2xl text-gray-900 dark:text-white leading-none">CLASHVISION v3.0-PCI-RL</h1>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 font-medium -mt-1">Strategic Battle Analysis • 93%+ Accuracy</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm text-gray-600 dark:text-gray-300">Live</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- Search Section -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <h2 class="font-bangers text-3xl text-gray-900 dark:text-white mb-2">PLAYER ANALYSIS</h2>
+                    <p class="text-gray-600 dark:text-gray-300">Enter a player tag to view live battle insights with ClashVision</p>
+                </div>
+                <div class="max-w-2xl mx-auto">
+                    <div class="flex gap-4 mb-4">
+                        <input 
+                            type="text" 
+                            id="playerTagInput" 
+                            placeholder="Enter player tag (e.g., 2LLP8VRU8)" 
+                            class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                    </div>
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button id="searchBtn" class="clash-btn clash-btn-primary flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <span>Search Player</span>
+                        </button>
+                        <button id="startPredictionBtn" class="clash-btn clash-btn-win flex items-center space-x-2" disabled>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <span>Live Prediction</span>
+                        </button>
+                        <button id="predictNextMatchBtn" class="clash-btn clash-btn-legendary flex items-center space-x-2" disabled>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            <span>Predict Match</span>
+                        </button>
+                        <button id="testBtn" class="clash-btn clash-btn-secondary flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                            <span>Test Strategic Analysis</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Player Info -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bangers text-xl text-gray-900 dark:text-white">PLAYER INFO</h3>
+                        <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="playerInfo" class="space-y-3">
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                            <p class="text-gray-500 dark:text-gray-400">Search for a player</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Battle Stats -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bangers text-xl text-gray-900 dark:text-white">BATTLE STATS</h3>
+                        <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="playerStats" class="space-y-3">
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                            <p class="text-gray-500 dark:text-gray-400">Statistics will appear here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Prediction -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bangers text-xl text-gray-900 dark:text-white">LIVE PREDICTION</h3>
+                        <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="livePrediction" class="text-center">
+                        <div class="text-4xl font-bold text-gray-900 dark:text-white mb-2" id="winProbability">--</div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Win Probability</p>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 dark:text-gray-400">Confidence:</span>
+                                <span id="confidence" class="font-semibold text-gray-900 dark:text-white">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 dark:text-gray-400">Phase:</span>
+                                <span id="battlePhase" class="font-semibold text-gray-900 dark:text-white">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PCI Analysis -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                <h3 class="font-bangers text-xl text-gray-900 dark:text-white mb-4">PLAYER CONSISTENCY INDEX (PCI)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="relative w-24 h-24 mx-auto mb-4">
+                            <!-- Simple circular gauge using CSS -->
+                            <div class="w-full h-full rounded-full border-8 border-gray-200 dark:border-gray-700 relative">
+                                <div id="pciCircleFill" class="absolute inset-0 rounded-full border-8 border-transparent transition-all duration-1000 ease-out pci-rotate" style="border-top-color: #3b82f6;"></div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="pciValue" class="text-2xl font-bold text-gray-900 dark:text-white">--</span>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">PCI Score</div>
+                        </div>
+                        <!-- Alternative: Progress bar display -->
+                        <div class="mt-4">
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-2">
+                                <div id="pciProgressBar" class="bg-blue-500 h-3 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Consistency Level</div>
+                        </div>
+                    </div>
+                    <div class="col-span-2">
+                        <div id="pciInterpretation" class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <span id="stabilityLevel" class="font-semibold text-gray-900 dark:text-white">--</span>
+                            </div>
+                            <p id="pciDescription" class="text-gray-600 dark:text-gray-300">Player consistency analysis will appear here</p>
+                            <div id="pciRecommendations" class="space-y-2 mt-4">
+                                <!-- PCI-based recommendations will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategic Analysis -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Battle Tactics -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="font-bangers text-xl text-gray-900 dark:text-white mb-4">🎯 BATTLE TACTICS</h3>
+                    <div id="battleTactics" class="space-y-3">
+                        <p class="text-gray-500 dark:text-gray-400">Strategic recommendations will appear here</p>
+                    </div>
+                </div>
+
+                <!-- Counter Strategies -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="font-bangers text-xl text-gray-900 dark:text-white mb-4">🛡️ COUNTER STRATEGIES</h3>
+                    <div id="counterStrategies" class="space-y-3">
+                        <p class="text-gray-500 dark:text-gray-400">Counter strategies will appear here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Suggestions -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                <h3 class="font-bangers text-xl text-gray-900 dark:text-white mb-6">🃏 SMART CARD SUGGESTIONS</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Cards to Add -->
+                    <div>
+                        <h4 class="font-semibold text-green-600 dark:text-green-400 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            Cards to Add
+                        </h4>
+                        <div id="cardsToAdd" class="space-y-3">
+                            <p class="text-gray-500 dark:text-gray-400">Card recommendations will appear here</p>
+                        </div>
+                    </div>
+
+                    <!-- Cards to Remove -->
+                    <div>
+                        <h4 class="font-semibold text-red-600 dark:text-red-400 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                            </svg>
+                            Cards to Remove
+                        </h4>
+                        <div id="cardsToRemove" class="space-y-3">
+                            <p class="text-gray-500 dark:text-gray-400">Removal suggestions will appear here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deck Improvements -->
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h4 class="font-semibold text-blue-600 dark:text-blue-400 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Deck Improvements
+                    </h4>
+                    <div id="deckImprovements" class="space-y-2">
+                        <p class="text-gray-500 dark:text-gray-400">Improvement suggestions will appear here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meta Insights -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                <h3 class="font-bangers text-xl text-gray-900 dark:text-white mb-6">📊 META INSIGHTS</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Trending Cards -->
+                    <div>
+                        <h4 class="font-semibold text-purple-600 dark:text-purple-400 mb-4">🔥 Trending Cards</h4>
+                        <div id="trendingCards" class="space-y-3">
+                            <p class="text-gray-500 dark:text-gray-400">Trending cards will appear here</p>
+                        </div>
+                    </div>
+
+                    <!-- Meta Adaptations -->
+                    <div>
+                        <h4 class="font-semibold text-orange-600 dark:text-orange-400 mb-4">🎯 Meta Adaptations</h4>
+                        <div id="metaAdaptations" class="space-y-3">
+                            <p class="text-gray-500 dark:text-gray-400">Adaptation recommendations will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Influencing Factors -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                <h3 class="font-bangers text-xl text-gray-900 dark:text-white mb-4">INFLUENCING FACTORS</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Deck Synergy</div>
+                        <div id="deckSynergyScore" class="text-lg font-bold text-gray-900 dark:text-white">--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Elixir Efficiency</div>
+                        <div id="elixirEfficiencyScore" class="text-lg font-bold text-gray-900 dark:text-white">--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Counter Potential</div>
+                        <div id="counterScore" class="text-lg font-bold text-gray-900 dark:text-white">--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                            </svg>
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Player Skill</div>
+                        <div id="skillScore" class="text-lg font-bold text-gray-900 dark:text-white">--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Recent Form</div>
+                        <div id="recentFormScore" class="text-lg font-bold text-gray-900 dark:text-white">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Section -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-bangers text-xl text-gray-900 dark:text-white">LIVE WIN PROBABILITY</h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-gray-600 dark:text-gray-300">Live Data</span>
+                    </div>
+                </div>
+                <div class="h-64">
+                    <canvas id="liveChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Next Match Prediction -->
+            <div id="nextMatchSection" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8" style="display: none;">
+                <h3 class="font-bangers text-xl text-gray-900 dark:text-white mb-6">NEXT MATCH PREDICTION</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="text-center">
+                        <div id="matchPredictionResult" class="text-4xl font-bold mb-2">--</div>
+                        <div id="matchPredictionText" class="text-gray-600 dark:text-gray-300 mb-4">Predict your next match</div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 dark:text-gray-400">Win Probability:</span>
+                                <span id="matchWinProb" class="font-bold">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 dark:text-gray-400">Confidence:</span>
+                                <span id="matchConfidence" class="font-bold">--</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 dark:text-gray-400">Current Form:</span>
+                                <span id="currentForm" class="font-bold">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bangers text-lg text-gray-900 dark:text-white mb-3">BATTLE STRATEGY</h4>
+                        <div id="matchRecommendations" class="space-y-2">
+                            <p class="text-gray-500 dark:text-gray-400">Click predict to see recommendations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                <h3 class="font-bangers text-xl text-gray-900 dark:text-white mb-4">AI RECOMMENDATIONS</h3>
+                <div id="recommendations" class="space-y-2">
+                    <p class="text-gray-500 dark:text-gray-400">Start a prediction to see AI recommendations</p>
+                </div>
+            </div>
+
+            <!-- Recent Battles -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bangers text-xl text-gray-900 dark:text-white">RECENT BATTLES</h3>
+                    <div class="w-8 h-8 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="recentBattles" class="space-y-3">
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                            </svg>
+                        </div>
+                        <p class="text-gray-500 dark:text-gray-400">Search for a player to see recent battles</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-orange-500 p-1">
+                            <div class="w-full h-full bg-white rounded flex items-center justify-center">
+                                <svg class="w-5 h-5" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Trophy Base -->
+                                    <circle cx="50" cy="65" r="18" fill="url(#footerGoldGradient)" stroke="#D97706" stroke-width="2"/>
+                                    <!-- Trophy Cup -->
+                                    <path d="M37 47 L63 47 L61 65 L39 65 Z" fill="url(#footerGoldGradient)" stroke="#D97706" stroke-width="1.5"/>
+                                    <!-- Crown -->
+                                    <path d="M42 37 L46 27 L50 32 L54 27 L58 37 L50 42 Z" fill="url(#footerCrownGradient)" stroke="#DC2626"/>
+                                    <!-- Elixir Drops -->
+                                    <circle cx="27" cy="32" r="3" fill="#EC4899"/>
+                                    <circle cx="73" cy="32" r="3" fill="#EC4899"/>
+                                    
+                                    <defs>
+                                        <linearGradient id="footerGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#FCD34D"/>
+                                            <stop offset="50%" style="stop-color:#F59E0B"/>
+                                            <stop offset="100%" style="stop-color:#D97706"/>
+                                        </linearGradient>
+                                        <linearGradient id="footerCrownGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#FEF3C7"/>
+                                            <stop offset="100%" style="stop-color:#F59E0B"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-bangers text-lg text-gray-900 dark:text-white">ClashVision</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 -mt-1">Live Battle Dashboard</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Powered by AI Analytics</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-500">Real-time Clash Royale Insights</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-xl">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-900 dark:text-white font-semibold">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/tilted-cards.js"></script>
+    <script src="js/animated-scroll.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+/* 3D Tilted Card Effects for ClashVision */
+.tilted-card {
+  position: relative;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* Removed overlay and shine effects - keeping only tilt */
+
+/* Remove inner shadows from player info and battle stats */
+#playerInfo, #playerStats {
+  box-shadow: none !important;
+}
+
+#playerInfo *, #playerStats * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+}
+
+/* Remove any inset shadows and borders */
+#playerInfo .space-y-3 > div,
+#playerStats .space-y-3 > div,
+#playerInfo div[class*="flex"],
+#playerStats div[class*="flex"] {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Ensure parent cards also have no inner shadows */
+.bg-white.dark\\:bg-gray-800 #playerInfo,
+.bg-white.dark\\:bg-gray-800 #playerStats {
+  box-shadow: none !important;
+}
+
+/* Mobile optimizations - reduced tilt sensitivity */
+@media (max-width: 768px) {
+  .tilted-card {
+    transform: none !important;
+  }
+}
